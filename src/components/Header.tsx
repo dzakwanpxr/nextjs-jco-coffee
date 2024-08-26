@@ -19,30 +19,20 @@ export default function Navbar() {
           />
         </Link>
         <ul className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-center">
-          <li>
-            <Link
-              href="/about"
-              className={`font-medium transition-colors ${
-                isActive("/about")
-                  ? "text-[#ff6600]"
-                  : "text-gray-800 hover:text-[#ff6600]"
-              }`}
-            >
-              ABOUT
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/products"
-              className={`font-medium transition-colors ${
-                isActive("/products")
-                  ? "text-[#ff6600]"
-                  : "text-gray-800 hover:text-[#ff6600]"
-              }`}
-            >
-              PRODUCTS
-            </Link>
-          </li>
+          {["ABOUT", "PRODUCTS"].map((item, index) => (
+            <li key={index}>
+              <Link
+                href={`/${item.toLowerCase()}`}
+                className={`font-medium transition-colors ${
+                  isActive(`/${item.toLowerCase()}`)
+                    ? "text-[#ff6600]"
+                    : "text-gray-800 hover:text-[#ff6600]"
+                }`}
+              >
+                {item}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </nav>

@@ -21,6 +21,7 @@ export default function MilestoneItem({
           src={image}
           alt={`Milestone ${year}`}
           fill
+          sizes="100%"
           className="object-cover rounded-lg"
         />
       </div>

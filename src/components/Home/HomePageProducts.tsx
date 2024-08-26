@@ -3,6 +3,7 @@ import ProductCard from "@/shared/components/ProductCard/ProductCard";
 interface Product {
   id: number;
   name: string;
+  slug: string;
   description: string;
   price: number;
   discount: number;
