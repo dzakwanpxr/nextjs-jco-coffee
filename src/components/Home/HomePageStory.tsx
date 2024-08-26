@@ -30,7 +30,7 @@ export default function HomePageStory() {
           />
         </div>
         <div className="w-full md:w-1/2 bg-gray-800 text-white p-8 md:p-16 flex flex-col justify-center">
-          <h3 className="text-2xl font-bold mb-4">WHY ARABICA?</h3>
+          <h2 className="text-2xl font-bold mb-4">WHY ARABICA?</h2>
           <p className="mb-4">
             Compared to Robusta coffee beans which often have a burnt-rubber
             taste and quality, Arabica beans are delicate, well-rounded,
