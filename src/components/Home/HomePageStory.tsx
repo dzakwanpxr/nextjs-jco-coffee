@@ -25,6 +25,7 @@ export default function HomePageStory() {
             src="/arabica.jpeg"
             alt="JCO Donuts"
             fill
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
             style={{ width: "100%", height: "100%" }}
           />
         </div>

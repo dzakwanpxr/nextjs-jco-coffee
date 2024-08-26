@@ -7,6 +7,7 @@ export default function AboutPageHeader() {
         src="/story-1.jpg"
         alt="JCO Global Map"
         fill
+        priority
         className="object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
