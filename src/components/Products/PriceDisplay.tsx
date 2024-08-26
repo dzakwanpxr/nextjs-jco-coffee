@@ -18,7 +18,7 @@ export default function PriceDisplay({ price, discount }: PriceDisplayProps) {
           <span className="ml-2 text-2xl font-bold text-[#661d0a]">
             {formatPrice(discountedPrice)}
           </span>
-          <span className="ml-2 bg-[#e53935] text-white px-2 py-1 rounded text-xs">
+          <span className="ml-2 bg-red-700 text-white px-2 py-1 rounded text-xs">
             {discount}% OFF
           </span>
         </div>

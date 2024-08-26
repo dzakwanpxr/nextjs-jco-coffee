@@ -57,7 +57,7 @@ export default function ProductCard({
           </div>
         </div>
         {discount > 0 && (
-          <span className="absolute top-2.5 right-2.5 bg-[#e53935] text-white px-2.5 py-1 rounded text-xs">
+          <span className="absolute top-2.5 right-2.5 bg-red-700 text-white px-2.5 py-1 rounded text-xs">
             {discount}% OFF
           </span>
         )}
