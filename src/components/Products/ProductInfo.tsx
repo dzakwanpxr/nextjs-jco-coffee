@@ -1,3 +1,5 @@
+import { toPascalCase } from "@/shared/utils/utils";
+
 interface ProductInfoProps {
   name: string;
   description: string;
@@ -26,16 +28,7 @@ export default function ProductInfo({
         <tbody>
           {Object.entries(nutritionFacts).map(([key, value]) => (
             <tr key={key}>
-              <td className="pr-4">
-                {" "}
-                {key
-                  .split(/(?=[A-Z])|_|\s/)
-                  .map(
-                    (word) =>
-                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                  )
-                  .join(" ")}
-              </td>
+              <td className="pr-4"> {toPascalCase(key)}</td>
               <td className="font-semibold">{value}</td>
             </tr>
           ))}

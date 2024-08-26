@@ -18,3 +18,10 @@ export const calculateDiscountPrice = (
   const discountAmount = price * (discountPercentage / 100);
   return price - discountAmount;
 };
+
+export const toPascalCase = (text: string): string => {
+  return text
+    .split(/(?=[A-Z])|_|\s/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
