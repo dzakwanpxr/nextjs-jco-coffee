@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/shared/utils/utils";
+import Counter from "@/shared/components/Counter/Counter";
+import { FaTrash } from "react-icons/fa";
 
 // Simulasi data keranjang
 const initialCartItems = [
@@ -27,7 +29,7 @@ export default function CartPage() {
   const updateQuantity = (id: number, newQuantity: number) => {
     setCartItems(
       cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(0, newQuantity) } : item
+        item.id === id ? { ...item, quantity: newQuantity } : item
       )
     );
   };
@@ -49,46 +51,52 @@ export default function CartPage() {
       ) : (
         <>
           {cartItems.map((item) => (
-            <div key={item.id} className="flex items-center border-b py-4">
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={80}
-                height={80}
-                className="mr-4"
-              />
-              <div className="flex-grow">
-                <h2 className="font-semibold">{item.name}</h2>
-                <p>{formatPrice(item.price)}</p>
+            <div
+              key={item.id}
+              className="flex flex-col sm:flex-row items-center border-b py-4"
+            >
+              <div className="flex items-center w-full sm:w-auto mb-4 sm:mb-0">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={80}
+                  height={80}
+                  className="mr-4"
+                />
+                <div className="flex-grow">
+                  <h2 className="font-semibold">{item.name}</h2>
+                  <p>{formatPrice(item.price)}</p>
+                </div>
               </div>
-              <div className="flex items-center">
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="px-2 py-1 bg-gray-200"
-                >
-                  -
-                </button>
-                <span className="mx-2">{item.quantity}</span>
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="px-2 py-1 bg-gray-200"
-                >
-                  +
-                </button>
+              <div className="flex items-center justify-between w-full sm:w-auto sm:ml-auto">
+                <div className="mr-4">
+                  <Counter
+                    value={item.quantity}
+                    onChange={(newValue: number) =>
+                      updateQuantity(item.id, newValue)
+                    }
+                    min={1}
+                    max={10}
+                  />
+                </div>
+                <div className="flex items-center">
+                  <p className="font-semibold mr-4 hidden sm:block">
+                    {formatPrice(item.price * item.quantity)}
+                  </p>
+                  <button onClick={() => removeItem(item.id)}>
+                    <FaTrash className="text-2xl text-gray-800 hover:text-red-500" />
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => removeItem(item.id)}
-                className="ml-4 text-red-500"
-              >
-                Remove
-              </button>
             </div>
           ))}
-          <div className="mt-4 text-right">
-            <p className="font-bold">Total: {formatPrice(totalPrice)}</p>
+          <div className="mt-4 flex flex-col sm:flex-row justify-between items-center">
+            <p className="font-bold mb-4 sm:mb-0">
+              Total: {formatPrice(totalPrice)}
+            </p>
             <Link
               href="/checkout"
-              className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded"
+              className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded text-center"
             >
               Proceed to Checkout
             </Link>

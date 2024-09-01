@@ -85,6 +85,7 @@ export default function CheckoutPage() {
                     id={method}
                     name="paymentMethod"
                     className="mr-2"
+                    defaultChecked={index === 2}
                   />
                   <label htmlFor={method}>{method}</label>
                 </div>
