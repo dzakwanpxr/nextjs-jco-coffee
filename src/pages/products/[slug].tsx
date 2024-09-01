@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { coffeeProducts } from "@/shared/data/coffeeProducts";
@@ -5,10 +6,11 @@ import ProductImage from "@/components/Products/ProductImage";
 import ProductInfo from "@/components/Products/ProductInfo";
 import PriceDisplay from "@/components/Products/PriceDisplay";
 import RelatedProducts from "@/components/Products/RelatedProducts";
+import Counter from "@/shared/components/Counter/Counter";
 
 interface ProductDetailProps {
   product: {
-    id: string;
+    id: number;
     name: string;
     slug: string;
     description: string;
@@ -19,7 +21,7 @@ interface ProductDetailProps {
     nutritionFacts: { [key: string]: string };
   };
   relatedProducts: Array<{
-    id: string;
+    id: number;
     name: string;
     slug: string;
     image: string;
@@ -31,10 +33,19 @@ export default function ProductDetail({
   relatedProducts,
 }: ProductDetailProps) {
   const router = useRouter();
+  const [quantity, setQuantity] = useState(1);
 
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
+
+  const incrementQuantity = () => setQuantity((prev) => prev + 1);
+  const decrementQuantity = () =>
+    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+
+  const handleAddToCart = () => {
+    console.log(`Adding ${quantity} ${product.name}(s) to cart`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -50,9 +61,22 @@ export default function ProductDetail({
             nutritionFacts={product.nutritionFacts}
           />
           <PriceDisplay price={product.price} discount={product.discount} />
-          <button className="bg-[#661d0a] text-white py-2 px-4 rounded hover:bg-[#4a1507] transition-colors">
-            Add to Cart
-          </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-4">
+            <div className="w-full sm:w-auto">
+              <Counter
+                value={quantity}
+                onChange={setQuantity}
+                min={1}
+                max={100}
+              />
+            </div>
+            <button
+              onClick={handleAddToCart}
+              className="w-full bg-[#661d0a] text-white py-2 px-4 rounded hover:bg-[#4a1507] transition-colors"
+            >
+              Add to Cart
+            </button>
+          </div>
         </div>
       </div>
       <RelatedProducts products={relatedProducts} />

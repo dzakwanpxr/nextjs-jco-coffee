@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 interface RelatedProduct {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   image: string;
