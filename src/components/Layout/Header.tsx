@@ -2,13 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { FaShoppingCart, FaUser } from "react-icons/fa";
+import { useAtomValue } from "jotai";
+import { cartItemsAtom } from "@/shared/store/cartItem";
 
 export default function Navbar() {
   const router = useRouter();
+  const cartItem = useAtomValue(cartItemsAtom);
 
   const isActive = (pathname: string) => router.pathname === pathname;
 
-  const cartItemCount = 3;
+  const cartItemCount = cartItem.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-md">

@@ -1,12 +1,8 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { formatPrice } from "@/shared/utils/utils";
-
-// Simulasi data checkout
-const checkoutItems = [
-  { id: 1, name: "Hot Americano", price: 25000, quantity: 2 },
-  { id: 2, name: "Iced Latte", price: 30000, quantity: 1 },
-];
+import { useAtom, useAtomValue } from "jotai";
+import { cartItemsAtom, cartTotalAtom } from "@/shared/store/cartItem";
 
 const paymentMethods = [
   "Credit Card",
@@ -18,16 +14,14 @@ const paymentMethods = [
 export default function CheckoutPage() {
   const router = useRouter();
 
-  const subtotal = checkoutItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const tax = subtotal * 0.1; // Asumsi pajak 10%
-  const total = subtotal + tax;
+  const [cartItems, setCartItems] = useAtom(cartItemsAtom);
+  const total = useAtomValue(cartTotalAtom);
+
+  const tax = total * 0.1;
+  const totalWithTax = total + tax;
 
   const handlePlaceOrder = () => {
-    // Simulasi proses checkout
-    console.log("Order placed");
+    setCartItems([]);
     router.push("/success");
   };
 
@@ -38,18 +32,18 @@ export default function CheckoutPage() {
         <div className="md:w-2/3">
           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
             <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-            {checkoutItems.map((item) => (
+            {cartItems.map((item) => (
               <div key={item.id} className="flex justify-between mb-2">
                 <span>
                   {item.name} x {item.quantity}
                 </span>
-                <span>{formatPrice(item.price * item.quantity)}</span>
+                <span>{formatPrice(item.discountedPrice * item.quantity)}</span>
               </div>
             ))}
             <div className="border-t mt-4 pt-4">
               <div className="flex justify-between mb-2">
                 <span>Subtotal</span>
-                <span>{formatPrice(subtotal)}</span>
+                <span>{formatPrice(total)}</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Tax (10%)</span>
@@ -57,7 +51,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between font-bold">
                 <span>Total</span>
-                <span>{formatPrice(total)}</span>
+                <span>{formatPrice(totalWithTax)}</span>
               </div>
             </div>
           </div>

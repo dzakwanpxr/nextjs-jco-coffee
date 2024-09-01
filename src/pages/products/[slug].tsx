@@ -7,6 +7,9 @@ import ProductInfo from "@/components/Products/ProductInfo";
 import PriceDisplay from "@/components/Products/PriceDisplay";
 import RelatedProducts from "@/components/Products/RelatedProducts";
 import Counter from "@/shared/components/Counter/Counter";
+import { useSetAtom } from "jotai";
+import { cartItemsAtom } from "@/shared/store/cartItem";
+import { calculateDiscountPrice } from "@/shared/utils/utils";
 
 interface ProductDetailProps {
   product: {
@@ -34,17 +37,44 @@ export default function ProductDetail({
 }: ProductDetailProps) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
+  const setCartItems = useSetAtom(cartItemsAtom);
 
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
 
-  const incrementQuantity = () => setQuantity((prev) => prev + 1);
-  const decrementQuantity = () =>
-    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
-
   const handleAddToCart = () => {
-    console.log(`Adding ${quantity} ${product.name}(s) to cart`);
+    const discountedPrice = calculateDiscountPrice(
+      product.price,
+      product.discount
+    );
+
+    setCartItems((prevItems) => {
+      const existingItemIndex = prevItems.findIndex(
+        (item) => item.id === product.id
+      );
+
+      if (existingItemIndex === -1) {
+        return [
+          ...prevItems,
+          {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            discountedPrice: discountedPrice,
+            discountPercentage: product.discount,
+            quantity: quantity,
+            image: product.image,
+          },
+        ];
+      }
+
+      return prevItems.map((item, index) =>
+        index === existingItemIndex
+          ? { ...item, quantity: item.quantity + quantity }
+          : item
+      );
+    });
   };
 
   return (

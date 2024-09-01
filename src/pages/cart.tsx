@@ -1,47 +1,32 @@
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useAtom } from "jotai";
+import {
+  cartItemsAtom,
+  cartTotalAtom,
+  cartSavingsAtom,
+} from "@/shared/store/cartItem";
 import { formatPrice } from "@/shared/utils/utils";
 import Counter from "@/shared/components/Counter/Counter";
 import { FaTrash } from "react-icons/fa";
 
-// Simulasi data keranjang
-const initialCartItems = [
-  {
-    id: 1,
-    name: "Hot Americano",
-    price: 25000,
-    quantity: 2,
-    image: "/americano.webp",
-  },
-  {
-    id: 2,
-    name: "Iced Latte",
-    price: 30000,
-    quantity: 1,
-    image: "/cafe-latte.webp",
-  },
-];
-
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const [cartItems, setCartItems] = useAtom(cartItemsAtom);
+  const [totalPrice] = useAtom(cartTotalAtom);
+  const [totalSavings] = useAtom(cartSavingsAtom);
 
   const updateQuantity = (id: number, newQuantity: number) => {
-    setCartItems(
-      cartItems.map((item) =>
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
         item.id === id ? { ...item, quantity: newQuantity } : item
       )
     );
   };
 
   const removeItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
-
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -65,7 +50,13 @@ export default function CartPage() {
                 />
                 <div className="flex-grow">
                   <h2 className="font-semibold">{item.name}</h2>
-                  <p>{formatPrice(item.price)}</p>
+                  <p className="line-through">{formatPrice(item.price)}</p>
+                  <p>{formatPrice(item.discountedPrice)}</p>
+                  {item.discountPercentage > 0 && (
+                    <p className="text-green-600">
+                      {item.discountPercentage}% off
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center justify-between w-full sm:w-auto sm:ml-auto">
@@ -81,7 +72,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex items-center">
                   <p className="font-semibold mr-4 hidden sm:block">
-                    {formatPrice(item.price * item.quantity)}
+                    {formatPrice(item.discountedPrice * item.quantity)}
                   </p>
                   <button onClick={() => removeItem(item.id)}>
                     <FaTrash className="text-2xl text-gray-800 hover:text-red-500" />
@@ -91,12 +82,20 @@ export default function CartPage() {
             </div>
           ))}
           <div className="mt-4 flex flex-col sm:flex-row justify-between items-center">
-            <p className="font-bold mb-4 sm:mb-0">
-              Total: {formatPrice(totalPrice)}
-            </p>
+            <div>
+              <p className="font-bold mb-2">Total: {formatPrice(totalPrice)}</p>
+              {totalSavings > 0 && (
+                <p className="text-green-600">
+                  You save:
+                  <span className="font-semibold ml-1">
+                    {formatPrice(totalSavings)}
+                  </span>
+                </p>
+              )}
+            </div>
             <Link
               href="/checkout"
-              className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded text-center"
+              className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded text-center mt-4 sm:mt-0"
             >
               Proceed to Checkout
             </Link>
