@@ -13,6 +13,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({
+  id,
   slug,
   name,
   image,
@@ -23,7 +24,7 @@ export default function ProductCard({
   const discountedPrice = calculateDiscountPrice(price, discount);
 
   return (
-    <Link href={`/products/${slug}`}>
+    <Link href={`/products/${id}`}>
       <div className="relative rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg group cursor-pointer">
         <div className="relative overflow-hidden">
           <Image

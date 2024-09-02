@@ -3,8 +3,10 @@ import "@/styles/globals.css";
 import { Provider } from "jotai";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const queryClient = new QueryClient();
   return (
     <>
       <Head>
@@ -14,11 +16,13 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Discover JCO's premium coffee and delicious donuts. Enjoy a wide variety of flavors and high-quality brews."
         />
       </Head>
-      <Provider>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </Provider>
+      <QueryClientProvider client={queryClient}>
+        <Provider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </Provider>
+      </QueryClientProvider>
     </>
   );
 }

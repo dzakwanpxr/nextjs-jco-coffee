@@ -2,70 +2,55 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAtom } from "jotai";
-import {
-  cartItemsAtom,
-  cartTotalAtom,
-  cartSavingsAtom,
-} from "@/shared/store/cartItem";
+import { cartAtom } from "@/shared/store/cartItem";
 import { formatPrice } from "@/shared/utils/utils";
 import Counter from "@/shared/components/Counter/Counter";
 import { FaTrash } from "react-icons/fa";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useAtom(cartItemsAtom);
-  const [totalPrice] = useAtom(cartTotalAtom);
-  const [totalSavings] = useAtom(cartSavingsAtom);
+  const [cart, setCart] = useAtom(cartAtom);
 
   const updateQuantity = (id: number, newQuantity: number) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    setCart((prevCart) => {
+      const newItems = prevCart.items.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item));
+      const newTotalAmount = newItems.reduce((total, item) => total + item.discountedPrice * item.quantity, 0);
+      return { ...prevCart, items: newItems, totalAmount: newTotalAmount };
+    });
   };
 
   const removeItem = (id: number) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    setCart((prevCart) => {
+      const newItems = prevCart.items.filter((item) => item.id !== id);
+      const newTotalAmount = newItems.reduce((total, item) => total + item.discountedPrice * item.quantity, 0);
+      return { ...prevCart, items: newItems, totalAmount: newTotalAmount };
+    });
   };
+
+  const totalSavings = cart.items.reduce((sum, item) => sum + (item.price - item.discountedPrice) * item.quantity, 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
-      {cartItems.length === 0 ? (
+      {cart.items.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
         <>
-          {cartItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col sm:flex-row items-center border-b py-4"
-            >
+          {cart.items.map((item) => (
+            <div key={item.id} className="flex flex-col sm:flex-row items-center border-b py-4">
               <div className="flex items-center w-full sm:w-auto mb-4 sm:mb-0">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  width={80}
-                  height={80}
-                  className="mr-4"
-                />
+                <Image src={item.image} alt={item.name} width={80} height={80} className="mr-4" />
                 <div className="flex-grow">
                   <h2 className="font-semibold">{item.name}</h2>
                   <p className="line-through">{formatPrice(item.price)}</p>
                   <p>{formatPrice(item.discountedPrice)}</p>
-                  {item.discountPercentage > 0 && (
-                    <p className="text-green-600">
-                      {item.discountPercentage}% off
-                    </p>
-                  )}
+                  {item.discountPercentage > 0 && <p className="text-green-600">{item.discountPercentage}% off</p>}
                 </div>
               </div>
               <div className="flex items-center justify-between w-full sm:w-auto sm:ml-auto">
                 <div className="mr-4">
                   <Counter
                     value={item.quantity}
-                    onChange={(newValue: number) =>
-                      updateQuantity(item.id, newValue)
-                    }
+                    onChange={(newValue: number) => updateQuantity(item.id, newValue)}
                     min={1}
                     max={10}
                   />
@@ -83,13 +68,11 @@ export default function CartPage() {
           ))}
           <div className="mt-4 flex flex-col sm:flex-row justify-between items-center">
             <div>
-              <p className="font-bold mb-2">Total: {formatPrice(totalPrice)}</p>
+              <p className="font-bold mb-2">Total: {formatPrice(cart.totalAmount)}</p>
               {totalSavings > 0 && (
                 <p className="text-green-600">
                   You save:
-                  <span className="font-semibold ml-1">
-                    {formatPrice(totalSavings)}
-                  </span>
+                  <span className="font-semibold ml-1">{formatPrice(totalSavings)}</span>
                 </p>
               )}
             </div>

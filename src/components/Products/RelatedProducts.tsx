@@ -4,7 +4,6 @@ import Image from "next/image";
 interface RelatedProduct {
   id: number;
   name: string;
-  slug: string;
   image: string;
 }
 
@@ -18,7 +17,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
       <h2 className="text-2xl font-bold mb-4">Related Products</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {products.map((product) => (
-          <Link key={product.id} href={`/products/${product.slug}`}>
+          <Link key={product.id} href={`/products/${product.id}`}>
             <div className="border rounded-lg p-2 hover:shadow-md transition-shadow flex flex-col items-center">
               <Image
                 src={product.image}
