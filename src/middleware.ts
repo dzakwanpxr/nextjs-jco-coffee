@@ -1,19 +1,31 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Daftar rute yang memerlukan autentikasi
-const protectedRoutes = ["/products", "/checkout", "/cart"];
+// Updated list of protected routes
+const protectedRoutes = [
+  /^\/products\/[^/]+$/, // Matches /products/{id} but not /products
+  "/checkout",
+  "/cart",
+];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("authToken")?.value;
+  const path = request.nextUrl.pathname;
 
-  if (!token && protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))) {
+  const isProtected = protectedRoutes.some((route) => {
+    if (typeof route === "string") {
+      return path.startsWith(route);
+    }
+    return route.test(path);
+  });
+
+  if (!token && isProtected) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("from", request.nextUrl.pathname);
+    loginUrl.searchParams.set("from", path);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (token && request.nextUrl.pathname === "/login") {
+  if (token && path === "/login") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
