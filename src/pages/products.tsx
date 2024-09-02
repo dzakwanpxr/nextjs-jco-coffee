@@ -1,14 +1,55 @@
 import ProductGrid from "@/components/Products/ProductGrid";
-import { coffeeProducts } from "@/shared/data/coffeeProducts";
+import ErrorMessage from "@/shared/components/ErrorMessage/ErrorMessage";
+import SkeletonProductGrid from "@/shared/components/Skeleton/SkeletonProductGrid";
+import { useQuery } from "@tanstack/react-query";
 
+interface CoffeeProduct {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  discount: number;
+  image: string;
+}
 export default function Products() {
+  const {
+    data: coffeeProducts,
+    isLoading,
+    error,
+  } = useQuery<CoffeeProduct[], Error>({
+    queryKey: ["coffeeProducts"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/coffee`
+      );
+      if (!response.ok) {
+        throw new Error("An error occurred while fetching the data");
+      }
+      return response.json();
+    },
+  });
+
+  if (error)
+    return (
+      <ErrorMessage
+        message={
+          error instanceof Error ? error.message : "An unknown error occurred"
+        }
+      />
+    );
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <section>
         <h1 className="text-center text-4xl md:text-5xl text-[#661d0a] mb-8">
           Our Products
         </h1>
-        <ProductGrid products={coffeeProducts} />
+        {isLoading ? (
+          <SkeletonProductGrid />
+        ) : (
+          <ProductGrid products={coffeeProducts ?? []} />
+        )}
       </section>
     </main>
   );
