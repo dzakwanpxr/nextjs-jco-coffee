@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import ProductImage from "@/components/Products/ProductImage";
@@ -6,8 +6,8 @@ import ProductInfo from "@/components/Products/ProductInfo";
 import PriceDisplay from "@/components/Products/PriceDisplay";
 import RelatedProducts from "@/components/Products/RelatedProducts";
 import Counter from "@/shared/components/Counter/Counter";
-import { useAtom, useSetAtom } from "jotai";
-import { cartAtom, cartItemsAtom } from "@/shared/store/cartItem";
+import { useAtom } from "jotai";
+import { cartAtom } from "@/shared/store/cartItem";
 import { calculateDiscountPrice } from "@/shared/utils/utils";
 import ErrorMessage from "@/shared/components/ErrorMessage/ErrorMessage";
 import SkeletonProductDetail from "@/shared/components/Skeleton/SkeletonProductDetail";
@@ -70,17 +70,15 @@ export default function ProductDetail() {
     queryFn: fetchAllProducts,
   });
 
-  const relatedProducts =
-    allProducts && product
-      ? getRandomItems(
-          allProducts.filter((p) => p.id !== product.id),
-          4
-        ).map(({ id, name, image }) => ({ id, name, image }))
-      : [];
-
-  if (productLoading) return <SkeletonProductDetail />;
-  if (productError) return <ErrorMessage message={productError.message} />;
-  if (!product) return <ErrorMessage message="Product not found" />;
+  const relatedProducts = useMemo(() => {
+    if (allProducts && product) {
+      return getRandomItems(
+        allProducts.filter((p) => p.id !== product.id),
+        4
+      ).map(({ id, name, image }) => ({ id, name, image }));
+    }
+    return [];
+  }, [allProducts, product]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -118,6 +116,10 @@ export default function ProductDetail() {
     });
   };
 
+  if (productLoading) return <SkeletonProductDetail />;
+  if (productError) return <ErrorMessage message={productError.message} />;
+  if (!product) return <ErrorMessage message="Product not found" />;
+
   const renderRelatedProducts = () => {
     if (allProductsError) {
       return <ErrorMessage message="Failed to load related products" />;
@@ -127,7 +129,6 @@ export default function ProductDetail() {
     }
     return <RelatedProducts products={relatedProducts} />;
   };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
