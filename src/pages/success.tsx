@@ -6,7 +6,20 @@ import Loader from "@/shared/components/Loader/Loader";
 import ErrorMessage from "@/shared/components/ErrorMessage/ErrorMessage";
 import { formatPrice } from "@/shared/utils/utils";
 
-function generateVANumber() {
+// Define types for the cart data
+interface CartItem {
+  name: string;
+  quantity: number;
+  discountedPrice: number;
+}
+
+interface CartData {
+  totalAmount: number;
+  paymentMethod: string;
+  items: CartItem[];
+}
+
+function generateVANumber(): string {
   return Math.random().toString().slice(2, 12);
 }
 
@@ -18,7 +31,7 @@ export default function SuccessPage() {
     data: cartData,
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<CartData, Error>({
     queryKey: ["cart", id],
     queryFn: async () => {
       if (!id) throw new Error("No checkout ID provided");
@@ -51,7 +64,7 @@ export default function SuccessPage() {
         <p>Payment Method: {cartData.paymentMethod}</p>
         <h3 className="text-lg font-semibold mt-2">Items:</h3>
         <ul>
-          {cartData.items.map((item, index) => (
+          {cartData.items.map((item: CartItem, index: number) => (
             <li key={index}>
               {item.name} x {item.quantity} - {formatPrice(item.discountedPrice * item.quantity)}
             </li>
