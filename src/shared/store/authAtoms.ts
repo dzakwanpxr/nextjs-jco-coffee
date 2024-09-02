@@ -36,7 +36,7 @@ export const loginAtom = atom(
   async (get, set, { username, password }: { username: string; password: string }) => {
     set(loadingAtom, true);
     try {
-      const response = await fetch("https://fakestoreapi.com/auth/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_API_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
