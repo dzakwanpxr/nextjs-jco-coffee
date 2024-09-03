@@ -4,24 +4,8 @@ import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import Loader from "@/shared/components/Loader/Loader";
 import ErrorMessage from "@/shared/components/ErrorMessage/ErrorMessage";
-import { formatPrice } from "@/shared/utils/utils";
-
-// Define types for the cart data
-interface CartItem {
-  name: string;
-  quantity: number;
-  discountedPrice: number;
-}
-
-interface CartData {
-  totalAmount: number;
-  paymentMethod: string;
-  items: CartItem[];
-}
-
-function generateVANumber(): string {
-  return Math.random().toString().slice(2, 12);
-}
+import { formatPrice, generateVANumber } from "@/shared/utils/utils";
+import { Cart, CartItem } from "@/types/types";
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -31,8 +15,8 @@ export default function SuccessPage() {
     data: cartData,
     isLoading,
     isError,
-  } = useQuery<CartData, Error>({
-    queryKey: ["cart", id],
+  } = useQuery<Cart, Error>({
+    queryKey: ["checkout", id],
     queryFn: async () => {
       if (!id) throw new Error("No checkout ID provided");
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/checkout/${id}`);
@@ -41,10 +25,8 @@ export default function SuccessPage() {
       }
       return response.json();
     },
-    enabled: !!id, // Only run the query when we have an ID
+    enabled: !!id,
   });
-
-  const vaNumber = generateVANumber();
 
   if (isLoading) return <Loader />;
   if (isError) return <ErrorMessage message="Failed to fetch order details" />;
@@ -56,7 +38,7 @@ export default function SuccessPage() {
       <p className="mb-4">Your order has been successfully placed.</p>
       <div className="bg-gray-100 p-4 rounded mb-4">
         <h2 className="text-xl font-semibold mb-2">Virtual Account Number</h2>
-        <p className="text-2xl font-bold">{vaNumber}</p>
+        <p className="text-2xl font-bold">{generateVANumber()}</p>
       </div>
       <div className="bg-gray-100 p-4 rounded mb-4">
         <h2 className="text-xl font-semibold mb-2">Order Details</h2>

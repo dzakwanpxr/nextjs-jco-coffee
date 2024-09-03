@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { loginAtom, loadingAtom } from "@/shared/store/authAtoms";
 import { useRouter } from "next/router";
 import Link from "next/link";
-
-type LoginInputs = {
-  username: string;
-  password: string;
-};
+import { LoginInputs } from "@/types/types";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -17,9 +13,9 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginInputs>();
-  const [, login] = useAtom(loginAtom);
-  const [loading] = useAtom(loadingAtom);
   const router = useRouter();
+  const loading = useAtomValue(loadingAtom);
+  const login = useSetAtom(loginAtom);
 
   const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
     try {

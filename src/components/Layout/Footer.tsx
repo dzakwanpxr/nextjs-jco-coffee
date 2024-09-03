@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaFacebookF, FaInstagram, FaYoutube } from "react-icons/fa6";
-
-const getYear = () => new Date().getFullYear();
+import { getYear } from "@/shared/utils/utils";
 
 export default function Footer() {
   return (
@@ -10,34 +9,30 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <div>
           <ul className="space-y-4">
-            {["OUR STORY", "OUR PRODUCTS", "STORES", "ONLINE ORDER"].map(
-              (item, index) => (
-                <li key={index}>
-                  <Link
-                    href={`/${item.toLowerCase().replace(" ", "-")}`}
-                    className="text-sm hover:text-[#ff6600] transition-colors"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              )
-            )}
+            {["OUR STORY", "OUR PRODUCTS", "STORES", "ONLINE ORDER"].map((item, index) => (
+              <li key={index}>
+                <Link
+                  href={`/${item.toLowerCase().replace(" ", "-")}`}
+                  className="text-sm hover:text-[#ff6600] transition-colors"
+                >
+                  {item}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
           <ul className="space-y-4">
-            {["IN THE PRESS", "EVENTS", "FRANCHISE", "CONTACT US"].map(
-              (item, index) => (
-                <li key={index}>
-                  <Link
-                    href={`/${item.toLowerCase().replace(" ", "-")}`}
-                    className="text-sm hover:text-[#ff6600] transition-colors"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              )
-            )}
+            {["IN THE PRESS", "EVENTS", "FRANCHISE", "CONTACT US"].map((item, index) => (
+              <li key={index}>
+                <Link
+                  href={`/${item.toLowerCase().replace(" ", "-")}`}
+                  className="text-sm hover:text-[#ff6600] transition-colors"
+                >
+                  {item}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
@@ -49,13 +44,7 @@ export default function Footer() {
           </div>
           <p className="text-sm mt-8 mb-4">CHANGE REGION</p>
           <div className="flex items-center">
-            <Image
-              src={"/id-flag.png"}
-              alt="Indonesia Flag"
-              width={24}
-              height={16}
-              className="mr-2"
-            />
+            <Image src={"/id-flag.png"} alt="Indonesia Flag" width={24} height={16} className="mr-2" />
             <p className="text-sm">INDONESIA</p>
           </div>
           <p className="text-sm mt-8 mb-4">LANGUAGE</p>
@@ -65,21 +54,13 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex flex-col justify-end space-y-4">
-          <p className="text-sm">
-            &copy; {getYear()} JCO DONUT & COFFEE. All Rights Reserved.
-          </p>
+          <p className="text-sm">&copy; {getYear()} JCO DONUT & COFFEE. All Rights Reserved.</p>
           <div className="text-sm">
-            <Link
-              href="/terms"
-              className="hover:text-[#ff6600] transition-colors"
-            >
+            <Link href="/terms" className="hover:text-[#ff6600] transition-colors">
               Terms of Use
             </Link>
             <span className="mx-2">|</span>
-            <Link
-              href="/privacy"
-              className="hover:text-[#ff6600] transition-colors"
-            >
+            <Link href="/privacy" className="hover:text-[#ff6600] transition-colors">
               Privacy Policy
             </Link>
           </div>

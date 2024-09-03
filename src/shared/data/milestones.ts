@@ -1,9 +1,4 @@
-interface Milestone {
-  id: number;
-  year: string;
-  description: string;
-  image: string;
-}
+import { Milestone } from "@/types/types";
 
 export const milestones: Milestone[] = [
   {

@@ -1,25 +1,14 @@
 import React from "react";
+import { CounterProps } from "@/types/types";
 
-interface CounterProps {
-  value: number;
-  onChange: (newValue: number) => void;
-  min?: number;
-  max?: number;
-}
+export default function Counter({ value = 1, onChange, min = 1, max = 100 }: CounterProps) {
+  const onIncrement = () => onChange(Math.min(value + 1, max));
 
-export default function Counter({
-  value,
-  onChange,
-  min = 1,
-  max = Infinity,
-}: CounterProps) {
-  const onIncrement = () => onChange(value + 1);
-
-  const onDecrement = () => onChange(value - 1);
+  const onDecrement = () => onChange(Math.max(value - 1, min));
 
   const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value, 10);
-    if (newValue >= min && newValue <= max) {
+    if (!isNaN(newValue) && newValue >= min && newValue <= max) {
       onChange(newValue);
     }
   };

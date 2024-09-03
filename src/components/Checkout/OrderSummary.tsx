@@ -1,6 +1,6 @@
 import React from "react";
 import { formatPrice } from "@/shared/utils/utils";
-import { CartItem } from "@/shared/store/cartItem";
+import { CartItem } from "@/types/types";
 
 interface OrderSummaryProps {
   items: CartItem[];

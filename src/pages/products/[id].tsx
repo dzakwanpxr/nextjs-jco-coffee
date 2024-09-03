@@ -1,61 +1,31 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
+import { useAtom, useSetAtom } from "jotai";
 import ProductImage from "@/components/Products/ProductImage";
 import ProductInfo from "@/components/Products/ProductInfo";
 import PriceDisplay from "@/components/Products/PriceDisplay";
 import RelatedProducts from "@/components/Products/RelatedProducts";
 import Counter from "@/shared/components/Counter/Counter";
-import { useAtom } from "jotai";
-import { cartAtom } from "@/shared/store/cartItem";
-import { calculateDiscountPrice } from "@/shared/utils/utils";
 import ErrorMessage from "@/shared/components/ErrorMessage/ErrorMessage";
 import SkeletonProductDetail from "@/shared/components/Skeleton/SkeletonProductDetail";
 import SkeletonRelatedProducts from "@/shared/components/Skeleton/SkeletonRelatedProducts";
-
-interface CoffeeProduct {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  discount: number;
-  image: string;
-  ingredients: string[];
-  nutritionFacts: { [key: string]: string };
-}
-
-const fetchProductById = async (id: string): Promise<CoffeeProduct> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/coffee/${id}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch product");
-  }
-  return response.json();
-};
-
-const fetchAllProducts = async (): Promise<CoffeeProduct[]> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/coffee`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
-  }
-  return response.json();
-};
-
-function getRandomItems<T>(array: T[], count: number): T[] {
-  const shuffled = [...array].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-}
+import { cartItemsAtom } from "@/shared/store/cartAtoms";
+import { calculateDiscountPrice, getRandomItems } from "@/shared/utils/utils";
+import { CartItem, Product } from "@/types/types";
+import { fetchAllProducts, fetchProductById } from "@/shared/services/api";
 
 export default function ProductDetail() {
   const router = useRouter();
   const { id } = router.query;
   const [quantity, setQuantity] = useState(1);
-  const [cart, setCart] = useAtom(cartAtom);
+  const [cartItems, setCartItems] = useAtom(cartItemsAtom);
 
   const {
     data: product,
     isLoading: productLoading,
     error: productError,
-  } = useQuery<CoffeeProduct, Error>({
+  } = useQuery<Product, Error>({
     queryKey: ["product", id],
     queryFn: () => fetchProductById(id as string),
     enabled: !!id,
@@ -65,7 +35,7 @@ export default function ProductDetail() {
     data: allProducts,
     isLoading: allProductsLoading,
     error: allProductsError,
-  } = useQuery<CoffeeProduct[], Error>({
+  } = useQuery<Product[], Error>({
     queryKey: ["allProducts"],
     queryFn: fetchAllProducts,
   });
@@ -75,7 +45,7 @@ export default function ProductDetail() {
       return getRandomItems(
         allProducts.filter((p) => p.id !== product.id),
         4
-      ).map(({ id, name, image }) => ({ id, name, image }));
+      );
     }
     return [];
   }, [allProducts, product]);
@@ -84,7 +54,7 @@ export default function ProductDetail() {
     if (!product) return;
 
     const discountedPrice = calculateDiscountPrice(product.price, product.discount);
-    const newItem = {
+    const newItem: CartItem = {
       id: product.id,
       name: product.name,
       price: product.price,
@@ -94,31 +64,19 @@ export default function ProductDetail() {
       image: product.image,
     };
 
-    setCart((prevCart) => {
-      const existingItemIndex = prevCart.items.findIndex((item) => item.id === product.id);
-      let newItems;
+    const existingItemIndex = cartItems.findIndex((item) => item.id === product.id);
+    let newItems: CartItem[];
 
-      if (existingItemIndex === -1) {
-        newItems = [...prevCart.items, newItem];
-      } else {
-        newItems = prevCart.items.map((item, index) =>
-          index === existingItemIndex ? { ...item, quantity: item.quantity + quantity } : item
-        );
-      }
+    if (existingItemIndex === -1) {
+      newItems = [...cartItems, newItem];
+    } else {
+      newItems = cartItems.map((item, index) =>
+        index === existingItemIndex ? { ...item, quantity: item.quantity + quantity } : item
+      );
+    }
 
-      const newTotalAmount = newItems.reduce((total, item) => total + item.discountedPrice * item.quantity, 0);
-
-      return {
-        ...prevCart,
-        items: newItems,
-        totalAmount: newTotalAmount,
-      };
-    });
+    setCartItems(newItems);
   };
-
-  if (productLoading) return <SkeletonProductDetail />;
-  if (productError) return <ErrorMessage message={productError.message} />;
-  if (!product) return <ErrorMessage message="Product not found" />;
 
   const renderRelatedProducts = () => {
     if (allProductsError) {
@@ -129,6 +87,11 @@ export default function ProductDetail() {
     }
     return <RelatedProducts products={relatedProducts} />;
   };
+
+  if (productLoading) return <SkeletonProductDetail />;
+  if (productError) return <ErrorMessage message={productError.message} />;
+  if (!product) return <ErrorMessage message="Product not found" />;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
