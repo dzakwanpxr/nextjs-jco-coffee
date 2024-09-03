@@ -1,18 +1,9 @@
 import { toPascalCase } from "@/shared/utils/utils";
+import { Product } from "@/types/types";
 
-interface ProductInfoProps {
-  name: string;
-  description: string;
-  ingredients: string[];
-  nutritionFacts: { [key: string]: string };
-}
+interface ProductInfoProps extends Pick<Product, "name" | "description" | "ingredients" | "nutritionFacts"> {}
 
-export default function ProductInfo({
-  name,
-  description,
-  ingredients,
-  nutritionFacts,
-}: ProductInfoProps) {
+export default function ProductInfo({ name, description, ingredients, nutritionFacts }: ProductInfoProps) {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">{name}</h1>

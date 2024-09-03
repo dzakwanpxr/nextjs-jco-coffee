@@ -1,14 +1,15 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useAtom } from "jotai";
-import { cartAtom } from "@/shared/store/cartItem";
+import { useAtom, useAtomValue } from "jotai";
+import { cartAtom, cartSavingsAtom } from "@/shared/store/cartAtoms";
 import { formatPrice } from "@/shared/utils/utils";
 import Counter from "@/shared/components/Counter/Counter";
 import { FaTrash } from "react-icons/fa";
 
 export default function CartPage() {
   const [cart, setCart] = useAtom(cartAtom);
+  const totalSavings = useAtomValue(cartSavingsAtom);
 
   const updateQuantity = (id: number, newQuantity: number) => {
     setCart((prevCart) => {
@@ -25,8 +26,6 @@ export default function CartPage() {
       return { ...prevCart, items: newItems, totalAmount: newTotalAmount };
     });
   };
-
-  const totalSavings = cart.items.reduce((sum, item) => sum + (item.price - item.discountedPrice) * item.quantity, 0);
 
   return (
     <div className="container mx-auto px-4 py-8">

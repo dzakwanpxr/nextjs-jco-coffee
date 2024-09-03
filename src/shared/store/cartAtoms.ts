@@ -1,22 +1,7 @@
-// shared/store/cartItem.ts
+import { Cart, CartItem } from "@/types/types";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-
-export interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  discountedPrice: number;
-  discountPercentage: number;
-  quantity: number;
-  image: string;
-}
-
-interface Cart {
-  items: CartItem[];
-  totalAmount: number;
-  paymentMethod: string;
-}
+import { calculateSubtotal, calculateTax, calculateTotalAmount } from "@/shared/utils/utils";
 
 const initialCart: Cart = {
   items: [],
@@ -26,20 +11,13 @@ const initialCart: Cart = {
 
 export const cartAtom = atomWithStorage<Cart>("cart", initialCart);
 
+// Derived atoms
 export const cartItemsAtom = atom(
   (get) => get(cartAtom).items,
   (get, set, newItems: CartItem[]) => {
     const cart = get(cartAtom);
     const newTotalAmount = calculateTotalAmount(newItems);
     set(cartAtom, { ...cart, items: newItems, totalAmount: newTotalAmount });
-  }
-);
-
-export const cartTotalAmountAtom = atom(
-  (get) => get(cartAtom).totalAmount,
-  (get, set, newTotalAmount: number) => {
-    const cart = get(cartAtom);
-    set(cartAtom, { ...cart, totalAmount: newTotalAmount });
   }
 );
 
@@ -51,14 +29,6 @@ export const cartPaymentMethodAtom = atom(
   }
 );
 
-// Helper functions
-function calculateTotalAmount(items: CartItem[]): number {
-  const subtotal = items.reduce((sum, item) => sum + item.discountedPrice * item.quantity, 0);
-  const tax = subtotal * 0.1; // Assuming 10% tax
-  return subtotal + tax;
-}
-
-// Derived atoms for convenience
 export const cartCountAtom = atom((get) => {
   const items = get(cartItemsAtom);
   return items.reduce((sum, item) => sum + item.quantity, 0);
@@ -66,7 +36,18 @@ export const cartCountAtom = atom((get) => {
 
 export const cartSubtotalAtom = atom((get) => {
   const items = get(cartItemsAtom);
-  return items.reduce((sum, item) => sum + item.discountedPrice * item.quantity, 0);
+  return calculateSubtotal(items);
+});
+
+export const cartTaxAtom = atom((get) => {
+  const subtotal = get(cartSubtotalAtom);
+  return calculateTax(subtotal);
+});
+
+export const cartTotalAmountAtom = atom((get) => {
+  const subtotal = get(cartSubtotalAtom);
+  const tax = get(cartTaxAtom);
+  return subtotal + tax;
 });
 
 export const cartSavingsAtom = atom((get) => {

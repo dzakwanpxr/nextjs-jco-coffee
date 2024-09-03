@@ -1,7 +1,13 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { useAtom } from "jotai";
-import { cartAtom } from "@/shared/store/cartItem";
+import { useAtom, useAtomValue } from "jotai";
+import {
+  cartAtom,
+  cartSubtotalAtom,
+  cartPaymentMethodAtom,
+  cartTaxAtom,
+  cartTotalAmountAtom,
+} from "@/shared/store/cartAtoms";
 import { useMutation } from "@tanstack/react-query";
 import OrderSummary from "@/components/Checkout/OrderSummary";
 import PickupOptions from "@/components/Checkout/PickupOptions";
@@ -12,10 +18,10 @@ const paymentMethods = ["Credit Card", "Debit Card", "Bank Transfer", "E-Wallet"
 export default function CheckoutPage() {
   const router = useRouter();
   const [cart, setCart] = useAtom(cartAtom);
-
-  const subtotal = cart.items.reduce((total, item) => total + item.discountedPrice * item.quantity, 0);
-  const tax = subtotal * 0.1;
-  const totalAmount = subtotal + tax;
+  const [paymentMethod, setPaymentMethod] = useAtom(cartPaymentMethodAtom);
+  const subtotal = useAtomValue(cartSubtotalAtom);
+  const tax = useAtomValue(cartTaxAtom);
+  const totalAmount = useAtomValue(cartTotalAmountAtom);
 
   const mutation = useMutation({
     mutationFn: (cartData: any) =>
@@ -39,7 +45,7 @@ export default function CheckoutPage() {
   });
 
   const handlePlaceOrder = async () => {
-    if (!cart.paymentMethod) {
+    if (!paymentMethod) {
       alert("Please select a payment method");
       return;
     }
@@ -47,14 +53,10 @@ export default function CheckoutPage() {
     const cartData = {
       items: cart.items,
       totalAmount: totalAmount,
-      paymentMethod: cart.paymentMethod,
+      paymentMethod: paymentMethod,
     };
 
     mutation.mutate(cartData);
-  };
-
-  const handlePaymentMethodChange = (method: string) => {
-    setCart((prevCart) => ({ ...prevCart, paymentMethod: method }));
   };
 
   return (
@@ -68,8 +70,8 @@ export default function CheckoutPage() {
         <div className="md:w-1/3">
           <PaymentMethod
             paymentMethods={paymentMethods}
-            selectedMethod={cart.paymentMethod}
-            onMethodChange={handlePaymentMethodChange}
+            selectedMethod={paymentMethod}
+            onMethodChange={setPaymentMethod}
             onPlaceOrder={handlePlaceOrder}
           />
         </div>

@@ -2,21 +2,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { FaShoppingCart, FaUser, FaSignOutAlt } from "react-icons/fa";
-import { useAtom, useAtomValue } from "jotai";
-import { cartItemsAtom } from "@/shared/store/cartItem";
+import { useAtomValue, useSetAtom } from "jotai";
+import { cartCountAtom } from "@/shared/store/cartAtoms";
 import { isAuthenticatedAtom, userAtom, logoutAtom } from "@/shared/store/authAtoms";
 
 export default function Navbar() {
   const router = useRouter();
-  const cartItem = useAtomValue(cartItemsAtom);
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
-  const [user] = useAtom(userAtom);
-  console.log(user);
-  const [, logout] = useAtom(logoutAtom);
+  const cartItemCount = useAtomValue(cartCountAtom);
+  const user = useAtomValue(userAtom);
+  const logout = useSetAtom(logoutAtom);
 
   const isActive = (pathname: string) => router.pathname === pathname;
-
-  const cartItemCount = cartItem.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleLogout = () => {
     logout();

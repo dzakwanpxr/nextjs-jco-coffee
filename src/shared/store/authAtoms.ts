@@ -4,10 +4,6 @@ import Cookies from "js-cookie";
 
 interface User {
   username: string;
-  name?: {
-    firstname: string;
-    lastname: string;
-  };
 }
 
 export const authTokenAtom = atomWithStorage<string | null>("authToken", null, {

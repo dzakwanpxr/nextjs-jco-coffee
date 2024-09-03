@@ -1,26 +1,9 @@
 import Image from "next/image";
 import { formatPrice, calculateDiscountPrice } from "@/shared/utils/utils";
 import Link from "next/link";
+import { Product } from "@/types/types";
 
-interface ProductCardProps {
-  id: number;
-  name: string;
-  slug: string;
-  image: string;
-  price: number;
-  discount: number;
-  description: string;
-}
-
-export default function ProductCard({
-  id,
-  slug,
-  name,
-  image,
-  price,
-  discount,
-  description,
-}: ProductCardProps) {
+export default function ProductCard({ id, name, image, price, discount, description }: Product) {
   const discountedPrice = calculateDiscountPrice(price, discount);
 
   return (
@@ -43,17 +26,11 @@ export default function ProductCard({
           <div className="flex items-center gap-2.5">
             {discount > 0 ? (
               <>
-                <span className="line-through text-gray-500">
-                  {formatPrice(price)}
-                </span>
-                <span className="font-bold text-[#661d0a]">
-                  {formatPrice(discountedPrice)}
-                </span>
+                <span className="line-through text-gray-500">{formatPrice(price)}</span>
+                <span className="font-bold text-[#661d0a]">{formatPrice(discountedPrice)}</span>
               </>
             ) : (
-              <span className="font-bold text-[#661d0a]">
-                {formatPrice(price)}
-              </span>
+              <span className="font-bold text-[#661d0a]">{formatPrice(price)}</span>
             )}
           </div>
         </div>
